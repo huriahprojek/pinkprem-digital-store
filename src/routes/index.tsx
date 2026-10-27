@@ -8,9 +8,9 @@ import { errorMessage, rupiah } from "@/lib/format";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PinkPrem — Langganan Aplikasi Premium Murah" },
+      { title: "fluffnshine — Langganan Aplikasi Premium Murah" },
       { name: "description", content: "Langganan Netflix, Canva, Spotify, ChatGPT dan lainnya dengan harga bersahabat." },
-      { property: "og:title", content: "PinkPrem — Langganan Aplikasi Premium" },
+      { property: "og:title", content: "fluffnshine — Langganan Aplikasi Premium" },
       { property: "og:description", content: "Paket langganan aplikasi premium, pesan mudah via WhatsApp." },
     ],
   }),

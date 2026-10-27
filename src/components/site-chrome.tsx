@@ -20,10 +20,10 @@ export function Logo() {
   return (
     <Link to="/" className="flex items-center gap-2">
       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary font-display text-lg font-bold text-primary-foreground shadow-soft">
-        P
+        f
       </span>
-      <span className="font-display text-xl font-semibold">
-        Pink<span className="text-primary">Prem</span>
+      <span className="font-display text-xl font-semibold lowercase">
+        fluff<span className="text-primary">nshine</span>
       </span>
     </Link>
   );
@@ -149,7 +149,7 @@ export function SiteFooter() {
           )}
         </div>
       </div>
-      <p className="pb-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} PinkPrem. Semua merek milik pemiliknya masing-masing.</p>
+      <p className="pb-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} fluffnshine. Semua merek milik pemiliknya masing-masing.</p>
     </footer>
   );
 }

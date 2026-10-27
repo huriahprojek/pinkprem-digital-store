@@ -12,7 +12,7 @@ export function waLink(phone: string, text: string): string {
 }
 
 export function fillTemplate(template: string, vars: Record<string, string>): string {
-  return template.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? vars[k] : m));
+  return template.replace(/\{(\w+)\}/g, (m, k: string) => vars[k] ?? m);
 }
 
 export interface OrderMessageItem {

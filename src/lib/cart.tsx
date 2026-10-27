@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { addLine, clampQuantity, type CartLine } from "./cart-math";
 
-const KEY = "pinkprem-cart-v1";
+const KEY = "fluffnshine-cart-v1";
 
 interface CartState {
   lines: CartLine[];

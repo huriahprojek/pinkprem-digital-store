@@ -21,7 +21,7 @@ describe("whatsapp", () => {
   });
   it("builds an encoded order message with code and total", () => {
     const msg = buildOrderMessage("Kode {order_code} total {total}\n{items}", {
-      store: "PinkPrem", order_code: "PP-1", name: "A", whatsapp: "08", email: "a@b.c", note: "",
+      store: "fluffnshine", order_code: "PP-1", name: "A", whatsapp: "08", email: "a@b.c", note: "",
       total: 70000,
       items: [{ product_name: "Netflix", option_name: "Sharing", variant_name: "1 Bulan", quantity: 2, unit_price: 35000, line_total: 70000 }],
     });
