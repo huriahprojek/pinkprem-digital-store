@@ -18,11 +18,11 @@ const NAV = [
 
 export function Logo() {
   return (
-    <Link to="/" className="flex items-center gap-2">
-      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary font-display text-lg font-bold text-primary-foreground shadow-soft">
+    <Link to="/" className="flex min-w-0 items-center gap-2">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary font-display text-lg font-bold text-primary-foreground shadow-soft">
         f
       </span>
-      <span className="font-display text-xl font-semibold lowercase">
+      <span className="truncate font-display text-xl font-semibold lowercase">
         fluff<span className="text-primary">nshine</span>
       </span>
     </Link>
@@ -48,14 +48,14 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
+      <div className="mx-auto grid h-16 max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 sm:px-6 md:flex md:justify-between md:gap-4">
         <Logo />
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="flex items-center gap-1">
           {NAV.map((n) => (
             <Link
               key={n.to}
               to={n.to}
-              className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
               activeProps={{ className: "bg-blush text-secondary-foreground" }}
               activeOptions={{ exact: n.to === "/" }}
             >
@@ -63,7 +63,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1">
           <Button asChild variant="ghost" size="icon" aria-label="Keranjang">
             <Link to="/keranjang" className="relative">
               <ShoppingBag />
@@ -77,25 +77,25 @@ export function SiteHeader() {
           <div className="hidden items-center gap-1 md:flex">
             {isAdmin && (
               <Button asChild variant="outline" size="sm">
-                <Link to="/admin"><LayoutDashboard /> Admin</Link>
+                <Link to="/admin"><LayoutDashboard /> <span className="hidden sm:inline">Admin</span></Link>
               </Button>
             )}
             {user ? (
               <>
                 <Button asChild variant="ghost" size="sm">
-                  <Link to="/akun"><User /> Akun</Link>
+                  <Link to="/akun" aria-label="Akun"><User /> <span className="hidden sm:inline">Akun</span></Link>
                 </Button>
-                <Button variant="ghost" size="icon" aria-label="Keluar" onClick={signOut}><LogOut /></Button>
+                <Button className="hidden md:inline-flex" variant="ghost" size="icon" aria-label="Keluar" onClick={signOut}><LogOut /></Button>
               </>
             ) : (
-              <Button asChild size="sm"><Link to="/auth">Masuk</Link></Button>
+              <Button asChild size="sm"><Link to="/auth"><User className="hidden sm:block" /> Masuk</Link></Button>
             )}
           </div>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu"><Menu /></Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72">
+            <SheetContent side="right" className="w-72 max-w-[90vw] px-4">
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <div className="mt-8 flex flex-col gap-1" onClick={() => setOpen(false)}>
                 {NAV.map((n) => (
@@ -105,8 +105,8 @@ export function SiteHeader() {
                 {user ? (
                   <>
                     <Link to="/akun" className="rounded-xl px-4 py-3 font-medium hover:bg-blush">Akun & Pesanan</Link>
-                    {isAdmin && <Link to="/admin" className="rounded-xl px-4 py-3 font-medium hover:bg-blush">Dashboard Admin</Link>}
-                    <button onClick={signOut} className="rounded-xl px-4 py-3 text-left font-medium hover:bg-blush">Keluar</button>
+                    {isAdmin && <Link to="/admin" className="rounded-xl px-4 py-3 font-medium hover:bg-blush">Dasbor Admin</Link>}
+                    <Button onClick={signOut} variant="ghost" className="justify-start">Keluar</Button>
                   </>
                 ) : (
                   <Button asChild className="mt-2"><Link to="/auth">Masuk / Daftar</Link></Button>
@@ -123,8 +123,8 @@ export function SiteHeader() {
 export function SiteFooter() {
   const { data: s } = useSettings();
   return (
-    <footer className="mt-20 border-t bg-blush/50">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3">
+    <footer className="mt-8 border-t bg-blush/50">
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:px-6 md:grid-cols-[2fr_1fr_1fr]">
         <div className="space-y-3">
           <Logo />
           <p className="text-sm text-muted-foreground">Langganan aplikasi premium dengan harga bersahabat, dikirim cepat via WhatsApp.</p>
@@ -143,7 +143,7 @@ export function SiteFooter() {
           {s && (
             <Button asChild variant="whatsapp" size="sm">
               <a href={waLink(s.admin_whatsapp, `Halo Admin ${s.store_name}, saya ingin bertanya.`)} target="_blank" rel="noopener noreferrer">
-                <MessageCircle /> Chat WhatsApp
+                <MessageCircle /> Hubungi WhatsApp
               </a>
             </Button>
           )}
