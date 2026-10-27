@@ -21,12 +21,12 @@ export function ProductTile({
   const { data: url } = useProductImage(imagePath);
   const letter = name.trim().charAt(0).toUpperCase() || "?";
   if (url)
-    return <img src={url} alt={name} className={cn("rounded-2xl object-cover aspect-square", className)} loading="lazy" />;
+    return <img src={url} alt={name} className={cn("rounded-lg object-cover aspect-square", className)} loading="lazy" />;
   return (
     <div
       aria-hidden
       className={cn(
-        "flex aspect-square items-center justify-center rounded-2xl font-display text-primary-foreground",
+        "flex aspect-square items-center justify-center rounded-lg font-display text-primary-foreground",
         className,
       )}
       // Per-product tile colour is admin-managed data, not a theme token.
@@ -65,7 +65,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="card-soft flex flex-col items-center gap-3 px-6 py-14 text-center">
+    <div className="flex flex-col items-center gap-3 px-4 py-12 text-center sm:py-16">
       {icon && <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-primary">{icon}</div>}
       <h3 className="text-xl font-semibold">{title}</h3>
       {description && <p className="max-w-sm text-sm text-muted-foreground">{description}</p>}
@@ -99,7 +99,7 @@ export function RestockButton({ product, variant, size = "sm" }: { product: stri
   return (
     <Button asChild variant="whatsapp" size={size}>
       <a href={waLink(s.admin_whatsapp, text)} target="_blank" rel="noopener noreferrer">
-        <MessageCircle /> Hubungi admin untuk restock
+        <MessageCircle /> Tanyakan ketersediaan
       </a>
     </Button>
   );

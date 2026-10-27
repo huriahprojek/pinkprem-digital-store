@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep storefront product presentation shared between home and catalog; both must read the existing catalog query so names, prices, and availability stay consistent.
+- Keep visual theme roles in src/styles.css and use the shared Button component for controls so presentation changes do not alter store behavior.
