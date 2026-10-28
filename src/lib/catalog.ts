@@ -43,6 +43,7 @@ function normalize(p: Product): Product {
     ...p,
     product_options: [...(p.product_options ?? [])].sort((a, b) => a.sort_order - b.sort_order),
     product_variants: [...(p.product_variants ?? [])]
+      .filter(v => v.is_active && (!v.option_id || p.product_options?.some(o => o.id === v.option_id && o.is_active)))
       .map((v) => ({ ...v, price: Number(v.price) }))
       .sort((a, b) => a.sort_order - b.sort_order),
   };
@@ -96,7 +97,8 @@ export function useProductImage(path: string | null | undefined) {
     enabled: !!path,
     staleTime: 1000 * 60 * 50,
     queryFn: async () => {
-      const { data } = await supabase.storage.from("product-images").createSignedUrl(path!, 60 * 60 * 24);
+      if (!path) return null;
+      const { data } = await supabase.storage.from("product-images").createSignedUrl(path, 60 * 60 * 24);
       return data?.signedUrl ?? null;
     },
   });

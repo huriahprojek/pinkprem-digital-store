@@ -95,11 +95,12 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
 export function RestockButton({ product, variant, size = "sm" }: { product: string; variant: string; size?: "sm" | "default" }) {
   const { data: s } = useSettings();
   if (!s) return null;
+  if (!s.whatsapp_configured) return <p className="text-xs text-muted-foreground">Contact WhatsApp belum tersedia.</p>;
   const text = fillTemplate(s.restock_message_template, { store: s.store_name, product, variant });
   return (
     <Button asChild variant="whatsapp" size={size}>
       <a href={waLink(s.admin_whatsapp, text)} target="_blank" rel="noopener noreferrer">
-        <MessageCircle /> Tanyakan ketersediaan
+        <MessageCircle /> Restock WhatsApp
       </a>
     </Button>
   );

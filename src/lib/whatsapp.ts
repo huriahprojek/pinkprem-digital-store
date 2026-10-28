@@ -19,6 +19,7 @@ export interface OrderMessageItem {
   product_name: string;
   option_name: string | null;
   variant_name: string;
+  duration_days?: number | null;
   quantity: number;
   unit_price: number;
   line_total: number;
@@ -40,7 +41,7 @@ export function buildOrderMessage(
   const items = o.items
     .map(
       (it, i) =>
-        `${i + 1}. ${it.product_name}${it.option_name ? ` (${it.option_name})` : ""} - ${it.variant_name}\n   ${it.quantity} x ${rupiah(it.unit_price)} = ${rupiah(it.line_total)}`,
+         `${i + 1}. ${it.product_name}${it.option_name ? ` (${it.option_name})` : ""} - ${it.variant_name}${it.duration_days ? ` · ${it.duration_days} hari` : ""}\n   ${it.quantity} x ${rupiah(it.unit_price)} = ${rupiah(it.line_total)}`,
     )
     .join("\n");
   return fillTemplate(template, {

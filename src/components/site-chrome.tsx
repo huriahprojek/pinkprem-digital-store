@@ -50,7 +50,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
       <div className="mx-auto grid h-16 max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 sm:px-6 md:flex md:justify-between md:gap-4">
         <Logo />
-        <nav className="flex items-center gap-1">
+        <nav className="hidden items-center gap-1 md:flex">
           {NAV.map((n) => (
             <Link
               key={n.to}
@@ -140,7 +140,7 @@ export function SiteFooter() {
         </div>
         <div className="text-sm">
           <p className="mb-2 font-semibold">Butuh bantuan?</p>
-          {s && (
+          {s?.whatsapp_configured && (
             <Button asChild variant="whatsapp" size="sm">
               <a href={waLink(s.admin_whatsapp, `Halo Admin ${s.store_name}, saya ingin bertanya.`)} target="_blank" rel="noopener noreferrer">
                 <MessageCircle /> Hubungi WhatsApp
