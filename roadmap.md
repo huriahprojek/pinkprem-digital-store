@@ -1,4 +1,6 @@
-# Perapian fluffnshine
-- [ ] Rapikan navigasi, beranda, kartu produk, dan tampilan katalog.
-- [ ] Konsistenkan typography, Bahasa Indonesia, dan metadata tanpa mengubah fungsi toko.
-- [ ] Periksa preview desktop dan mobile, alur navigasi, overflow, serta pengujian yang tersedia.
+# Penyelesaian fluffnshine
+- [ ] Katalog, pilihan paket, keranjang, checkout atomic, dan ringkasan WhatsApp.
+- [ ] Login/daftar, profil, riwayat pesanan, dan bootstrap admin.
+- [ ] Dasbor admin: laporan, pesanan, produk/options/variants, pelanggan/role, pengaturan.
+- [ ] Audit dan perkuat validasi transaksi, RLS, history, snapshot durasi, dan modal privat.
+- [ ] Pengujian aturan, alur nyata, metadata, serta preview desktop/mobile.
