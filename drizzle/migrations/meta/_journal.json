@@ -8,6 +8,13 @@
       "when": 1793000248108,
       "tag": "0000_pinkprem_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793149317656,
+      "tag": "0001_complete_store_safety",
+      "breakpoints": true
     }
   ]
 }
