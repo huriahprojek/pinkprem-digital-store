@@ -10,26 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AkunRouteImport } from './routes/akun'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as KeranjangRouteImport } from './routes/keranjang'
 import { Route as KontakRouteImport } from './routes/kontak'
 import { Route as ProdukRouteImport } from './routes/produk'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAkunRouteImport } from './routes/_authenticated/akun'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AkunRoute = AkunRouteImport.update({
-  id: '/akun',
-  path: '/akun',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -52,56 +47,67 @@ const ProdukRoute = ProdukRouteImport.update({
   path: '/produk',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAkunRoute = AuthenticatedAkunRouteImport.update({
+  id: '/akun',
+  path: '/akun',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/akun': typeof AkunRoute
   '/auth': typeof AuthRoute
   '/keranjang': typeof KeranjangRoute
   '/kontak': typeof KontakRoute
   '/produk': typeof ProdukRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/akun': typeof AuthenticatedAkunRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/akun': typeof AkunRoute
   '/auth': typeof AuthRoute
   '/keranjang': typeof KeranjangRoute
   '/kontak': typeof KontakRoute
   '/produk': typeof ProdukRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/akun': typeof AuthenticatedAkunRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/akun': typeof AkunRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/keranjang': typeof KeranjangRoute
   '/kontak': typeof KontakRoute
   '/produk': typeof ProdukRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/akun': typeof AuthenticatedAkunRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/admin' | '/akun' | '/auth' | '/keranjang' | '/kontak' | '/produk'
+    '/' | '/auth' | '/keranjang' | '/kontak' | '/produk' | '/admin' | '/akun'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/akun' | '/auth' | '/keranjang' | '/kontak' | '/produk'
+  to: '/' | '/auth' | '/keranjang' | '/kontak' | '/produk' | '/admin' | '/akun'
   id:
     | '__root__'
     | '/'
-    | '/admin'
-    | '/akun'
+    | '/_authenticated'
     | '/auth'
     | '/keranjang'
     | '/kontak'
     | '/produk'
+    | '/_authenticated/admin'
+    | '/_authenticated/akun'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
-  AkunRoute: typeof AkunRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   KeranjangRoute: typeof KeranjangRoute
   KontakRoute: typeof KontakRoute
@@ -117,18 +123,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/akun': {
-      id: '/akun'
-      path: '/akun'
-      fullPath: '/akun'
-      preLoaderRoute: typeof AkunRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -159,13 +158,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdukRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/akun': {
+      id: '/_authenticated/akun'
+      path: '/akun'
+      fullPath: '/akun'
+      preLoaderRoute: typeof AuthenticatedAkunRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAkunRoute: typeof AuthenticatedAkunRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAkunRoute: AuthenticatedAkunRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
-  AkunRoute: AkunRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   KeranjangRoute: KeranjangRoute,
   KontakRoute: KontakRoute,

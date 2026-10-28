@@ -1,11 +1,24 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { EmptyState } from "@/components/shop";
-
-export const Route = createFileRoute("/keranjang")({
-  head: () => ({ meta: [{ title: "Keranjang — fluffnshine" }, { name: "description", content: "Keranjang Belanja fluffnshine" }, { property: "og:title", content: "Keranjang — fluffnshine" }, { property: "og:description", content: "Keranjang Belanja fluffnshine" }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
-  component: () => (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-      <EmptyState title="Keranjang Belanja" description="Halaman ini sedang disiapkan." />
-    </div>
-  ),
-});
+import { createFileRoute,Link } from '@tanstack/react-router';
+import { useState } from 'react';
+import { useQuery,useQueryClient } from '@tanstack/react-query';
+import { useServerFn } from '@tanstack/react-start';
+import { ShoppingBag,Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import { useCart } from '@/lib/cart';
+import { useAuth } from '@/lib/auth';
+import { productsQuery,useSettings } from '@/lib/catalog';
+import { checkoutOrder } from '@/lib/commerce.functions';
+import { customerSchema } from '@/lib/commerce-rules';
+import { cartSubtotal } from '@/lib/cart-math';
+import { rupiah,errorMessage } from '@/lib/format';
+import { Button } from '@/components/ui/button';
+import { EmptyState,PageLoader,ErrorState } from '@/components/shop';
+import { Field,TextField,Page } from '@/components/commerce-ui';
+import { OrderDetail,orderWhatsApp,type OrderDTO } from '@/components/order-detail';
+export const Route=createFileRoute('/keranjang')({head:()=>({meta:[{title:'Keranjang dan Checkout — fluffnshine'},{name:'description',content:'Periksa paket dan jumlah pembelian, lalu buat pesanan fluffnshine.'},{property:'og:title',content:'Keranjang — fluffnshine'},{property:'og:description',content:'Ringkasan belanja paket premium Anda.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),component:Cart});
+function Cart(){const cart=useCart();const {user}=useAuth();const {data:settings}=useSettings();const q=useQuery(productsQuery);const qc=useQueryClient();const submitOrder=useServerFn(checkoutOrder);const [name,setName]=useState('');const [phone,setPhone]=useState('');const [email,setEmail]=useState('');const [note,setNote]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [order,setOrder]=useState<OrderDTO|null>(null);
+ const rows=cart.lines.map(line=>{const p=q.data?.find(p=>p.product_variants.some(v=>v.id===line.variantId));const v=p?.product_variants.find(v=>v.id===line.variantId);return {line,p,v}});const valid=rows.length>0&&rows.every(({line,v})=>v&&v.stock>=line.quantity&&line.quantity<=100);const subtotal=cartSubtotal(rows.map(({line,v})=>({price:v?.price??0,quantity:line.quantity})));
+ const checkout=async(e:React.FormEvent)=>{e.preventDefault();if(busy||!valid||!user)return;setBusy(true);setError('');const popup=settings?.whatsapp_configured?window.open('about:blank','_blank'):null;try{const customer=customerSchema.parse({full_name:name,whatsapp:phone,email:email||user.email||'',note});const result=await submitOrder({data:{customer,items:cart.lines.map(l=>({variant_id:l.variantId,quantity:l.quantity}))}});setOrder(result);cart.clear();void qc.invalidateQueries({queryKey:['products']});void qc.invalidateQueries({queryKey:['account']});toast.success('Pesanan berhasil dibuat');if(settings?.whatsapp_configured&&popup){popup.opener=null;popup.location.href=orderWhatsApp(result,settings);}else popup?.close();}catch(e){popup?.close();setError(e instanceof z.ZodError?e.issues[0]?.message??'Data tidak valid':errorMessage(e));void qc.invalidateQueries({queryKey:['products']});}finally{setBusy(false)}};
+ return <Page title={order?'Pesanan berhasil dibuat':'Keranjang belanja'}>{order?<div className="mx-auto max-w-xl"><OrderDetail order={order}/><Button asChild variant="outline" className="mt-6"><Link to="/akun">Riwayat pesanan</Link></Button></div>:q.isLoading?<PageLoader/>:q.error?<ErrorState message={errorMessage(q.error)} onRetry={()=>q.refetch()}/>:cart.lines.length===0?<EmptyState icon={<ShoppingBag/>} title="Keranjang masih kosong" action={<Button asChild><Link to="/produk">Pilih paket</Link></Button>}/>:<div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]"><div className="divide-y">{rows.map(({line,p,v})=><article key={line.variantId} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 py-5"><div className="min-w-0"><p className="font-semibold">{p?.name ?? 'Paket tidak tersedia'}</p><p className="mt-1 text-sm text-muted-foreground">{p?.product_options.find(o=>o.id===v?.option_id)?.name} · {v?.name}{v?.duration_days?` · ${v.duration_days} hari`:''}</p><p className="mt-2 text-sm">{rupiah(v?.price)} / unit</p>{(!v||v.stock<line.quantity)&&<p role="alert" className="mt-2 text-xs text-destructive">Stok berubah. Kurangi jumlah atau hapus paket.</p>}<div className="mt-3 max-w-28"><Field label="Jumlah" type="number" value={line.quantity} onChange={n=>cart.setQuantity(line.variantId,Math.min(100,Number(n)),v?.stock??0)}/></div></div><div className="flex flex-col items-end justify-between"><Button variant="ghost" size="icon" aria-label={`Hapus ${p?.name??'paket'}`} onClick={()=>cart.remove(line.variantId)}><Trash2/></Button><p className="text-sm font-bold">{rupiah((v?.price??0)*line.quantity)}</p></div></article>)}</div><div className="min-w-0"><div className="mb-6 flex justify-between border-b pb-4 font-bold"><span>Subtotal</span><span>{rupiah(subtotal)}</span></div>{!user?<div className="space-y-4"><p className="text-sm text-muted-foreground">Masuk untuk melanjutkan pembelian.</p><Button asChild className="w-full"><Link to="/auth" search={{redirect:'/keranjang'}}>Masuk untuk checkout</Link></Button></div>:<form className="space-y-4" onSubmit={checkout}><h2 className="text-xl font-semibold">Data pemesan</h2><Field label="Nama lengkap" value={name} onChange={setName} required/><Field label="WhatsApp" type="tel" value={phone} onChange={setPhone} maxLength={24} required/><Field label="Email" type="email" value={email||user.email||''} onChange={setEmail} maxLength={255} required/><TextField label="Catatan (opsional)" value={note} onChange={setNote}/>{error&&<p role="alert" className="text-sm text-destructive">{error}</p>}<Button className="w-full" disabled={busy||!valid}>{busy?'Membuat pesanan…':'Buat pesanan'}</Button><p className="text-xs leading-5 text-muted-foreground">Pembayaran dikonfirmasi manual melalui WhatsApp admin.</p>{settings&&!settings.whatsapp_configured&&<p className="text-xs text-destructive">Nomor WhatsApp admin belum diatur.</p>}</form>}</div></div>}</Page>
+}

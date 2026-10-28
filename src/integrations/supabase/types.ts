@@ -85,6 +85,7 @@ export type Database = {
       order_items: {
         Row: {
           created_at: string
+          duration_days: number | null
           id: string
           line_total: number
           option_name: string | null
@@ -98,6 +99,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          duration_days?: number | null
           id?: string
           line_total: number
           option_name?: string | null
@@ -111,6 +113,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          duration_days?: number | null
           id?: string
           line_total?: number
           option_name?: string | null
@@ -492,6 +495,7 @@ export type Database = {
     Functions: {
       admin_exists: { Args: never; Returns: boolean }
       admin_report: { Args: { _from: string; _to: string }; Returns: Json }
+      admin_save_variant: { Args: { _data: Json }; Returns: string }
       admin_set_role: {
         Args: { _make_admin: boolean; _user_id: string }
         Returns: undefined

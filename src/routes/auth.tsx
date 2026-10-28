@@ -1,11 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { EmptyState } from "@/components/shop";
-
-export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Masuk — fluffnshine" }, { name: "description", content: "Masuk / Daftar fluffnshine" }, { property: "og:title", content: "Masuk — fluffnshine" }, { property: "og:description", content: "Masuk / Daftar fluffnshine" }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
-  component: () => (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-      <EmptyState title="Masuk / Daftar" description="Halaman ini sedang disiapkan." />
-    </div>
-  ),
-});
+import { createFileRoute,useNavigate,Link } from '@tanstack/react-router';
+import { useState } from 'react';
+import { z } from 'zod';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/auth';
+import { Button } from '@/components/ui/button';
+import { Field,Page } from '@/components/commerce-ui';
+import { errorMessage } from '@/lib/format';
+export const Route=createFileRoute('/auth')({validateSearch:(s:Record<string,unknown>)=>({redirect:typeof s.redirect==='string' && ['/keranjang','/akun','/admin'].includes(s.redirect)?s.redirect:'/akun'}),head:()=>({meta:[{title:'Masuk dan Daftar — fluffnshine'},{name:'description',content:'Masuk ke akun fluffnshine untuk membeli paket dan melacak pesanan.'},{property:'og:title',content:'Masuk dan Daftar — fluffnshine'},{property:'og:description',content:'Akun pelanggan fluffnshine.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),component:Auth});
+function Auth(){const {user}=useAuth();const navigate=useNavigate();const {redirect}=Route.useSearch();const [mode,setMode]=useState<'login'|'register'|'reset'>('login');const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [name,setName]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [notice,setNotice]=useState('');
+ const submit=async(e:React.FormEvent)=>{e.preventDefault();setBusy(true);setError('');try{z.string().email('Email tidak valid').max(255).parse(email);if(mode==='reset'){const r=await supabase.auth.resetPasswordForEmail(email,{redirectTo:`${window.location.origin}/auth`});if(r.error)throw r.error;setNotice('Tautan pemulihan dikirim ke email Anda.');}else{z.string().min(8,'Kata sandi minimal 8 karakter').max(128).parse(password);const r=mode==='register'?await supabase.auth.signUp({email,password,options:{data:{full_name:z.string().trim().min(2).max(100).parse(name)},emailRedirectTo:`${window.location.origin}/auth`}}):await supabase.auth.signInWithPassword({email,password});if(r.error)throw r.error;if(r.data.session){toast.success('Berhasil masuk');await navigate({to:redirect==='/keranjang'?'/keranjang':redirect==='/admin'?'/admin':'/akun'});}else setNotice('Periksa email untuk mengonfirmasi pendaftaran sebelum masuk.');}}catch(e){setError(e instanceof z.ZodError?e.issues[0]?.message ?? 'Data tidak valid':errorMessage(e));}finally{setBusy(false)}};
+ return <Page title={mode==='register'?'Daftar akun':mode==='reset'?'Pulihkan kata sandi':'Masuk ke fluffnshine'}><div className="mx-auto max-w-md">{user?<div className="space-y-4"><p>Anda sudah masuk.</p><Button asChild><Link to="/akun">Buka akun</Link></Button></div>:<><div className="mb-6 flex gap-2"><Button variant={mode==='login'?'secondary':'ghost'} onClick={()=>{setMode('login');setError('');setNotice('')}}>Masuk</Button><Button variant={mode==='register'?'secondary':'ghost'} onClick={()=>{setMode('register');setError('');setNotice('')}}>Daftar</Button></div><form className="space-y-5" onSubmit={submit}>{mode==='register'&&<Field label="Nama lengkap" value={name} onChange={setName} required/>}<Field label="Email" type="email" value={email} onChange={setEmail} maxLength={255} required/>{mode!=='reset'&&<Field label="Kata sandi" type="password" value={password} onChange={setPassword} maxLength={128} required/>}{error&&<p role="alert" className="text-sm text-destructive">{error}</p>}{notice&&<p role="status" className="rounded-md bg-secondary p-3 text-sm">{notice}</p>}<Button className="w-full" disabled={busy}>{busy?'Memproses…':mode==='register'?'Buat akun':mode==='reset'?'Kirim tautan':'Masuk'}</Button></form><Button variant="link" className="mt-3 px-0" onClick={()=>setMode('reset')}>Lupa kata sandi?</Button></>}</div></Page>
+}

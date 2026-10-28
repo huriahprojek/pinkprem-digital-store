@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { EmptyState, ProductTile, RestockButton } from "@/components/shop";
 import { minPrice, totalStock, type Product } from "@/lib/catalog";
 import { rupiah } from "@/lib/format";
+import { PackagePicker } from "@/components/package-picker";
 
 export function ProductGrid({ products, searchable = false }: { products: Product[]; searchable?: boolean }) {
   const [search, setSearch] = useState("");
@@ -37,8 +38,7 @@ export function ProductGrid({ products, searchable = false }: { products: Produc
     <Dialog open={selected !== null} onOpenChange={open => { if (!open) setSelected(null); }}><DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-lg">
       {selected && <><DialogHeader><DialogTitle>{selected.name}</DialogTitle><DialogDescription>{selected.short_description || selected.category}</DialogDescription></DialogHeader>
         {selected.description && <p className="whitespace-pre-line text-sm leading-6 text-muted-foreground">{selected.description}</p>}
-        <div className="divide-y">{selected.product_variants.filter(v => v.is_active).map(v => <div key={v.id} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 py-4"><div className="min-w-0"><p className="break-words text-sm font-semibold">{v.name}</p><p className="mt-1 text-xs text-muted-foreground">{v.duration_days ? `${v.duration_days} hari · ` : ""}{v.stock > 0 ? `${v.stock} tersedia` : "Stok habis"}</p></div><p className="text-sm font-semibold">{rupiah(v.price)}</p></div>)}</div>
-        {totalStock(selected) === 0 && <RestockButton product={selected.name} variant="Semua paket" />}
+        <PackagePicker key={selected.id} product={selected} />
       </>}
     </DialogContent></Dialog>
   </>;
